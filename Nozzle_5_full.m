@@ -12,12 +12,13 @@ n_cr = p_cr/k/T_cr;
     l_N2 = I(sw_o,1);
     l_O2 = I(sw_o,2);
     
-   % dy = zeros(l_N2 + 1 + l_O2 + 1 + 5 , 1); %  90 *1
+    % dy = zeros(l_N2 + 1 + l_O2 + 1 + 5 , 1); %  90 *1
     A = zeros(l_N2 +1 + l_O2 + 1 + 5 , l_N2 + 1 + l_O2 + 1 + 5); 
     b = zeros(l_N2 + 1 + l_O2 + 1 + 5 , 1);
-    S = zeros(2); % S(1) сама площадь, S(2) производная
+    S = zeros(2);                                                          % S(1) - nozzle cross-section, S(2) - its derivative 
     
-    % геом параметры сопла
+    % nozzle geometry
+    
     switch sw_n
         case 1
              r_cr = 1e-3;
@@ -26,8 +27,8 @@ n_cr = p_cr/k/T_cr;
              S(2) = 2*tan(alpha)*(1+x*tan(alpha));
     end
     
-    % безразмерные переменные
-
+    % dimensionless variables
+    
     n_N2 = y(1 : l_N2 + 1);
     n_O2 = y(l_N2 + 2 : l_N2 + l_O2 + 2);
     n_NO = y(l_N2 + l_O2 + 3);
@@ -39,9 +40,9 @@ n_cr = p_cr/k/T_cr;
     M = m./M_cr;
     
     n = [n_N2' n_O2' n_NO n_N n_O];
-    Mn = [M(1).*n_N2' M(2).*n_O2' M(3)*n_NO M(4)*n_N M(5)*n_O];
+    rho = sum([M(1).*n_N2' M(2).*n_O2' M(3)*n_NO M(4)*n_N M(5)*n_O]);
     
-    % вектора колебательных энергий молекул
+    % vibrational energy of molecules
     
      e = e_i_c;
      e_i_N2 = cell2mat(e(1))./k./T_cr; %1*48
@@ -49,39 +50,40 @@ n_cr = p_cr/k/T_cr;
      e_i = [e_i_N2 e_i_O2];
      e_i_NO = cell2mat(e(3))./k./T_cr;
     
-     % энергии нулевых уровней
+     % vibrational energy of 0th levels
      
      e_0_N2 = h*c/k/T_cr*(w(1)/2 - wx(1)/4);
      e_0_O2 = h*c/k/T_cr*(w(2)/2 - wx(2)/4);
      e_0 = [e_0_N2.*ones(1,l_N2 + 1) e_0_O2.*ones(1,l_O2 + 1)];
      e_0_NO = h*c/k/T_cr*(w(3)/2 - wx(3)/4);
      
-     % энергии образования
+     % formation energy
      
      e_NO = (D(1)/2 + D(2)/2 - D(3))/k/T_cr;
      e_N = D(1)/2/k/T_cr;
      e_O = D(2)/2/k/T_cr;
      
-     %% ЛЧ, матрица А
+     %% Left part, matrix А (A(y)*y = b)
 
     for j = 1 : l_N2 + 1 + l_O2 + 1
-        A(j,j) = v;     % уравнения кинетики
-        A(j,l_N2 + l_O2 + 6) = n(j);     % уравнения кинетики
-        A(l_N2 + l_O2 + 6 , j) = T;  % уравнение импульса
-        A(l_N2 + l_O2 + 7 , j) = 2.5*T + e_i(j) + e_0(j);  % уравнение энергии???? e_0 ???
+        A(j , j) = v;                                                      % kinetic equations
+        A(j , l_N2 + l_O2 + 6) = n(j);                                     % kinetic equations
+        A(l_N2 + l_O2 + 6 , j) = T;                                        % momentum equation
+        A(l_N2 + l_O2 + 7 , j) = 2.5*T + e_i(j) + e_0(j);                  % energy equation
     end
     
     for j = l_N2 + l_O2 + 3  : l_N2 + l_O2 + 5
-        A(j,j) = v;     % уравнения кинетики
-        A(j,l_N2 + l_O2 + 6) = n(j);     % уравнения кинетики
-        A(l_N2 + l_O2 + 6 , j) = T;  % уравнение импульса
+        A(j , j) = v;                                                      % kinetic equations
+        A(j , l_N2 + l_O2 + 6) = n(j);                                     % kinetic equations
+        A(l_N2 + l_O2 + 6 , j) = T;                                        % momentum equation
     end
-    % уравнение импульса
     
-    A(l_N2 + l_O2 + 6 , l_N2 + l_O2 + 6) = M_cr*v_cr^2/k/T_cr * v *sum(Mn);
+    % momentum equation
+    
+    A(l_N2 + l_O2 + 6 , l_N2 + l_O2 + 6) = M_cr*v_cr^2/k/T_cr * v *rho;
     A(l_N2 + l_O2 + 6 , l_N2 + l_O2 + 7) = sum(n);
     
-    % уравнение энергии
+    % energy equation
     
     A(l_N2 + l_O2 + 7 , l_N2 + l_O2 + 3) = 2.5*T + e_0_NO + e_NO;
     A(l_N2 + l_O2 + 7 , l_N2 + l_O2 + 4) = 1.5*T + e_N;
@@ -90,12 +92,14 @@ n_cr = p_cr/k/T_cr;
                                                n_NO*(3.5*T + e_0_NO + e_NO) + ...
                                                n_N*(2.5*T + e_N) + n_O*(2.5*T + e_O));
     A(l_N2 + l_O2 + 7 , l_N2 + l_O2 + 7) = 2.5*(sum(n_N2) + sum(n_O2) + n_NO) + ...
-                                           + 1.5*n_N + 1.5*n_O;
+                                           + 1.5*(n_N + n_O);
     AA = sparse(A);
     
-    %% ПЧ вектор b
-    % коэффициенты
-        % размерные переменные
+    %% Right part, vector b
+    
+    %%% reaction rate coefficients and source terms
+        
+    % dimensional variables
     
     n_N2_d = [0 n_N2'.*n_cr 0]'*ones(1,5); %50*5
     n_O2_d = [0 n_O2'.*n_cr 0]'*ones(1,5);
@@ -104,15 +108,18 @@ n_cr = p_cr/k/T_cr;
     n_O_d = n_O*n_cr;
     T_d = T*T_cr;
     
-    % колебательный обмен
+    %%% vibrational energy transitions (SSH)
     
     [k_N2_VT, k_N2_N2_VV, k_N2_O2_VV, ~] = k_ssh(1,T_d);
     [k_O2_VT, k_O2_N2_VV, k_O2_O2_VV, ~] = k_ssh(2,T_d);
     
-    %%% VT
-
-    k_N2_VT_r = k_N2_VT.*exp(-(e_i_N2(2 : end) - e_i_N2(1 : end-1))'*ones(1,5)./T); %детальный баланс
-    k_O2_VT_r = k_O2_VT.*exp(-(e_i_O2(2 : end) - e_i_O2(1 : end-1))'*ones(1,5)./T);
+    % VT
+    
+    i_N2 = 0 : l_N2 - 1;
+    i_O2 = 0 : l_O2 - 1;
+    
+    k_N2_VT_r = k_N2_VT.*exp(-h*c/k/T_cr.*(w(1) - 2*wx(1) - 2*wx(1).*i_N2)'*ones(1,5)./T); %детальный баланс
+    k_O2_VT_r = k_O2_VT.*exp(-h*c/k/T_cr.*(w(2) - 2*wx(2) - 2*wx(2).*i_O2)'*ones(1,5)./T);
     
     k_N2_VT = [zeros(1,5); k_N2_VT; zeros(1,5)]; %49*5
     k_O2_VT = [zeros(1,5); k_O2_VT; zeros(1,5)];
@@ -132,15 +139,15 @@ n_cr = p_cr/k/T_cr;
                         n_O2_d(2 : end - 1,:).*k_O2_VT(1 : end - 1,:) + ...
                         n_O2_d(3 : end,:).*k_O2_VT(2 : end,:) - ...
                         n_O2_d(2 : end - 1,:).*k_O2_VT_r(2 : end,:)) , 2);
-    %%% VV
+    % VV & VV'
     
     n_N2_d = [0 n_N2'.*n_cr 0]; %1*50
     n_O2_d = [0 n_O2'.*n_cr 0];
     
-    k_N2_N2_VV_r = k_N2_N2_VV.*exp(-((e_i_N2(2 : end) - e_i_N2(1 : end-1))'*ones(1,l_N2) + ... % переписать через diff
-                                   ones(l_N2,1)*(e_i_N2(1 : end-1) - e_i_N2(2 : end)))./T);
-    k_O2_O2_VV_r = k_O2_O2_VV.*exp(-((e_i_O2(2 : end) - e_i_O2(1 : end-1))'*ones(1,l_O2) + ...
-                                   ones(l_O2,1)*(e_i_O2(1 : end-1) - e_i_O2(2 : end)))./T);
+    k_N2_N2_VV_r = k_N2_N2_VV.*exp(-2*h*c*wx(1)/k/T_cr.*(i_N2'*ones(1,l_N2) - ... 
+                                   ones(l_N2,1)*i_N2)./T);
+    k_O2_O2_VV_r = k_O2_O2_VV.*exp(-2*h*c*wx(2)/k/T_cr.*(i_O2'*ones(1,l_O2) - ...
+                                   ones(l_O2,1)*i_O2)./T);
 
     k_N2_N2_VV = [zeros(1,l_N2) ; k_N2_N2_VV; zeros(1,l_N2)]; %49*47
     k_O2_O2_VV = [zeros(1,l_O2) ; k_O2_O2_VV; zeros(1,l_O2)];
@@ -157,10 +164,10 @@ n_cr = p_cr/k/T_cr;
                   n_O2_d(3 : end)'*n_O2_d(2 : end - 2).*k_O2_O2_VV(2 : end, :) - ...
                   n_O2_d(2 : end - 1)'*n_O2_d(3 : end - 1).*k_O2_O2_VV_r(2 : end, :) , 2);
     
-    k_N2_O2_VV_r =  k_N2_O2_VV.*exp(-((e_i_N2(2 : end) - e_i_N2(1 : end-1))'*ones(1,l_O2) + ...
-                                    ones(l_N2,1)*(e_i_O2(1 : end-1) - e_i_O2(2 : end)))./T);
-    k_O2_N2_VV_r =  k_O2_N2_VV.*exp(-((e_i_O2(2 : end) - e_i_O2(1 : end-1))'*ones(1,l_N2) + ...
-                                    ones(l_O2,1)*(e_i_N2(1 : end-1) - e_i_N2(2 : end)))./T);   
+    k_N2_O2_VV_r =  k_N2_O2_VV.*exp(-h*c/k/T_cr.*((w(1) - wx(1).*(i_N2 + 2))'*ones(1,l_O2) - ...
+                                    ones(l_N2,1)*(w(2) - wx(2).*(i_O2 + 2)))./T);
+    k_O2_N2_VV_r =  k_O2_N2_VV.*exp(-h*c/k/T_cr.*((w(2) - wx(2).*(i_O2 + 2))'*ones(1,l_N2) + ...
+                                    ones(l_O2,1)*(w(1) - wx(1).*(i_N2 + 2)))./T);   
     
     k_N2_O2_VV = [zeros(1,l_O2);  k_N2_O2_VV; zeros(1,l_O2)];
     k_N2_O2_VV_r = [zeros(1,l_O2);  k_N2_O2_VV_r; zeros(1,l_O2)];
