@@ -50,22 +50,21 @@ k10 = P10.*Zn;
 
 i = {0 : I(sw_o,1) - 1, 0 : I(sw_o,2) - 1, 0 : I(sw_o,3) - 1};
 
-
 dE = h*c.*wx(sp);
 E1 = h*c.*(w(sp) - 2*wx(sp));
 
-switch sw_o
-        case 1
-            VT = (cell2mat(i(sp)) + 1)'*k10;
-        case 2
-            gamma0 = 2*pi^2.*E1./alpha./h.*sqrt(0.5.*mu./k./T);
-            g_i = (2*pi^2.*(E1 - 2.*cell2mat(i(sp)).*dE))'*(alpha.*h./sqrt(0.5.*mu./k./T)).^(-1);
-            deltaVT = zeros(I(sw_o,sp),5);
-            l = find(g_i >= 20);
-            ll = find(g_i < 20);
-            deltaVT(l) = 4.*gamma0(fix((l - 1)./I(sw_o,sp)) + 1).^(2/3).*dE./E1;
-            deltaVT(ll) = 4/3.*gamma0(fix((ll - 1)./I(sw_o,sp)) + 1).*dE./E1;
-            VT = (cell2mat(i(sp)) + 1)'*k10.*exp((ones(1,5)'*cell2mat(i(sp)))'.*deltaVT).*exp(-(ones(1,5)'*cell2mat(i(sp)))'.*h*c*wx(sp)/k/T);
+if sw_o == 1
+        VT = (cell2mat(i(sp)) + 1)'*k10;
+else
+        gamma0 = 2*pi^2.*E1./alpha./h.*sqrt(0.5.*mu./k./T);
+        g_i = (2*pi^2.*(E1 - 2.*cell2mat(i(sp)).*dE))'*(alpha.*h./sqrt(0.5.*mu./k./T)).^(-1);
+        deltaVT = zeros(I(sw_o,sp),5);
+        l = find(g_i >= 20);
+        ll = find(g_i < 20);
+        deltaVT(l) = 4.*gamma0(fix((l - 1)./I(sw_o,sp)) + 1).^(2/3).*dE./E1;
+        deltaVT(ll) = 4/3.*gamma0(fix((ll - 1)./I(sw_o,sp)) + 1).*dE./E1;
+        VT = (cell2mat(i(sp)) + 1)'*k10.*exp((ones(1,5)'*cell2mat(i(sp)))'.*deltaVT).*exp(-(ones(1,5)'*cell2mat(i(sp)))'.*h*c*wx(sp)/k/T);
+
 end
 
 % VV & VV'
@@ -81,32 +80,31 @@ k1001 = Q10.*Zn(1:3);
 
 VV = cell(1,3);
 
-switch sw_o
-        case 1
-            for l = 1:3
-                VV(l) = {(cell2mat(i(sp)) + 1)'*(cell2mat(i(l)) + 1).*k1001(l)};
-            end
-        case 2
-            deltaVV = 8/3*pi^2*dE/h/alpha(sp)*sqrt(mu(sp)/2/k/T);
-            for l = 1:3
-                if (l == sp)
-                    A = cell2mat(i(sp))'*ones(1,I(sw_o,sp)) - ...
-                           ones(I(sw_o,sp),1)*cell2mat(i(sp));
-                    VV(l) = {(cell2mat(i(sp)) + 1)'*(cell2mat(i(l)) + 1).*k1001(l).* ...
-                            exp(-deltaVV.*abs(A)).*(1.5 - 0.5.*exp(-deltaVV.*abs(A))).* ...
-                            exp(A'*dE/k/T)};
-                else
-                    deltaVVs = 8/3*pi^2*c*wx(l)/alpha(l)*sqrt(mu(l)/2/k/T);
-                    p = (w(sp) - w(l) - 2*(wx(l) - wx(sp)))/2/wx(sp);
-                    A = deltaVVs.*ones(I(sw_o,sp) , 1)*cell2mat(i(l)) - ...
-                        deltaVV.*cell2mat(i(sp))'*ones(1 , I(sw_o,l)) + ...
-                        deltaVV*p.*ones(I(sw_o,sp) , I(sw_o,l));
-                    B = ones(I(sw_o,sp) , 1)*cell2mat(i(l)).*h.*c*wx(sp) - ...
-                        cell2mat(i(sp))'*ones(1, I(sw_o,l)).*h.*c.*wx(l);
-                    VV(l) = {(cell2mat(i(sp)) + 1)'*(cell2mat(i(l)) + 1).*k1001(l).* ...
-                            exp(-abs(A)).*exp(deltaVV.*p).*exp(B./k./T)};
-                end
-            end
+if sw_o == 1
+    for l = 1:3
+        VV(l) = {(cell2mat(i(sp)) + 1)'*(cell2mat(i(l)) + 1).*k1001(l)};
+    end
+else
+    deltaVV = 8/3*pi^2*dE/h/alpha(sp)*sqrt(mu(sp)/2/k/T);
+    for l = 1:3
+        if (l == sp)
+            A = cell2mat(i(sp))'*ones(1,I(sw_o,sp)) - ...
+                ones(I(sw_o,sp),1)*cell2mat(i(sp));
+            VV(l) = {(cell2mat(i(sp)) + 1)'*(cell2mat(i(l)) + 1).*k1001(l).* ...
+                exp(-deltaVV.*abs(A)).*(1.5 - 0.5.*exp(-deltaVV.*abs(A))).* ...
+                exp(A'*dE/k/T)};
+        else
+            deltaVVs = 8/3*pi^2*c*wx(l)/alpha(l)*sqrt(mu(l)/2/k/T);
+            p = (w(sp) - w(l) - 2*(wx(l) - wx(sp)))/2/wx(sp);
+            A = deltaVVs.*ones(I(sw_o,sp) , 1)*cell2mat(i(l)) - ...
+            deltaVV.*cell2mat(i(sp))'*ones(1 , I(sw_o,l)) + ...
+            deltaVV*p.*ones(I(sw_o,sp) , I(sw_o,l));
+            B = ones(I(sw_o,sp) , 1)*cell2mat(i(l)).*h.*c*wx(sp) - ...
+                cell2mat(i(sp))'*ones(1, I(sw_o,l)).*h.*c.*wx(l);
+            VV(l) = {(cell2mat(i(sp)) + 1)'*(cell2mat(i(l)) + 1).*k1001(l).* ...
+                    exp(-abs(A)).*exp(deltaVV.*p).*exp(B./k./T)};
+        end
+     end
 end
 
 VV_N2 = cell2mat(VV(1));

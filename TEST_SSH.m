@@ -204,3 +204,12 @@ xlim([0, I(sw_o,2)]);
 ylabel('lg(k_{O_2,i->i-1}^{N_2,35->36})');
 hold off
 fig = fig + 1;
+%%
+figure(fig)
+
+semilogy(TT, squeeze(K_ssh_VT_N2(9,1,:))), hold on
+semilogy(TT, squeeze(K_ssh_VT_N2(9,4,:)))
+semilogy(TT, squeeze(K_ssh_VV_N2_N2(9,3,:)))
+legend('VT с молекулой','VT c атомом','VV');
+hold off
+fig = fig + 1;

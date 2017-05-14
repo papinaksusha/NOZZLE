@@ -98,7 +98,9 @@ n_cr = p_cr/k/T_cr;
     
     k_VT = [k_VT(: , sp) k_VT(: , sp + 3)];
    
-    k_VT_r = k_VT.*exp(-(e_i(2 : end) - e_i(1 : end - 1))'*ones(1,2)./T); %детальный баланс
+    i = 0 : l - 2;
+
+    k_VT_r = k_VT.*exp(-h*c/k/T_cr.*(w(sp) - 2*wx(sp) - 2*wx(sp).*i)'*ones(1,2)./T); %детальный баланс
     
     k_VT = [zeros(1,2); k_VT; zeros(1,2)]; %49*5
     k_VT_r = [zeros(1,2); k_VT_r; zeros(1,2)];
@@ -114,8 +116,8 @@ n_cr = p_cr/k/T_cr;
     
     n_mol_d = [0 n_mol'.*n_cr 0]; %1*50
     
-    k_VV_r = k_VV.*exp(-((e_i(2 : end) - e_i(1 : end-1))'*ones(1 , l - 1) + ... % переписать через номера уровней
-                                   ones(l - 1 , 1)*(e_i(1 : end-1) - e_i(2 : end)))./T);
+    k_VV_r = k_VV.*exp(-2*h*c*wx(sp)/k/T_cr.*(i'*ones(1,l-1) - ... 
+                                   ones(l-1,1)*i)./T);
 
     k_VV = [zeros(1 , l - 1) ; k_VV; zeros(1, l - 1)]; %49*47
     k_VV_r = [zeros(1 , l - 1) ; k_VV_r; zeros(1 , l - 1)]; %49*47
@@ -129,10 +131,11 @@ n_cr = p_cr/k/T_cr;
     
     % диссоциация
     
-    n_mol_d = n_mol.*n_cr*ones(1,2); %48*5
+    n_mol_d = n_mol.*n_cr*ones(1,2); %48*2
     
-    k_dis = k_diss(sp,T_d); % 1*48 
-    k_dis = k_dis'*ones(1,2) ;% потому что не различается для партнера 48*5
+    k_dis = k_diss(sp,T_d); % 48*5 
+    k_dis = [k_dis(:,sp) k_dis(:,sp+3)];
+%    k_dis = k_dis'*ones(1,2) ;% потому что не различается для партнера 48*5
    
     k_rec = k_dis.*(m(sp)/m(sp + 3)^2)^(1.5).*h^3.*(2*pi*k*T_d)^(-1.5).*...
                 T_d./theta_r(sp).*0.5.*exp(-e_i'*ones(1,2)./T + D(sp)/k/T_d); 
