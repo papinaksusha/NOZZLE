@@ -1,5 +1,4 @@
-global L
-
+%initial values
 l_N2 = I(sw_o , 1) + 1;
 l_O2 = I(sw_o , 2) + 1;
 l_mol =  l_N2 + l_O2 + 1;
@@ -7,10 +6,6 @@ l_c = l_mol + 2;
 l_v = l_c + 1;
 l_T = l_v + 1;
 
-L = [l_N2 l_O2 l_mol l_c l_v l_T];
-
-%%
-%initial values
 x_N = 0.01;
 x = 0 : x_N : 50;
 %x = [0,50];
@@ -45,14 +40,14 @@ options = odeset('AbsTol', 1e-52, 'RelTol', 2.3e-14, 'OutputFcn', @odeplot, 'Out
 toc
 
 n_i_N2 = Y(: , 1 : l_N2)./(sum(Y(: , 1 : l_c) , 2)*ones(1 , l_N2));
-n_i_O2 = Y(: , l_N2 + 1 : l_N2 + l_O2)./(sum(Y(: , 1 : l_c) , 2)*ones(1 , I(sw_o,2) + 1));
+n_i_O2 = Y(: , l_N2 + 1 : l_N2 + l_O2)./(sum(Y(: , 1 : l_c) , 2)*ones(1 , l_O2));
 n_N2 = sum(n_i_N2 , 2);
 n_O2 = sum(n_i_O2 , 2);
-n_NO = Y(: , I(sw_o,1) + I(sw_o,2) + 3)./sum(Y(: , 1 : I(sw_o,1) + I(sw_o,2) + 5) , 2);
-n_N = Y(: , I(sw_o,1) + I(sw_o,2) + 4)./sum(Y(: , 1 : I(sw_o,1) + I(sw_o,2) + 5) , 2);
-n_O = Y(: , I(sw_o,1) + I(sw_o,2) + 5)./sum(Y(: , 1 : I(sw_o,1) + I(sw_o,2) + 5) , 2);
-v = Y(: , I(sw_o,1) + I(sw_o,2) + 6).*v_cr;
-T = Y(: , end).*T_cr;
+n_NO = Y(: , l_mol)./sum(Y(: , 1 : l_c) , 2);
+n_N = Y(: , l_mol + 1)./sum(Y(: , 1 : l_c) , 2);
+n_O = Y(: , l_c)./sum(Y(: , 1 : l_c) , 2);
+v = Y(: , l_v).*v_cr;
+T = Y(: , l_T).*T_cr;
 
 figure(1)
 plot(X , T);
@@ -117,15 +112,15 @@ ylim([1e-5,1]);
 
 %% conservation laws
 
-N_init = [sum(init(1 : I(sw_o,1) + 1)) sum(init(I(sw_o,1) + 2 : I(sw_o,1) + I(sw_o,2) + 2)) ...
-          init(I(sw_o,1) + I(sw_o,2) + 3 : I(sw_o,1) + I(sw_o,2) + 5)'].*n_cr;
-n_i_N2_d = Y(: , 1 : I(sw_o,1) + 1).*n_cr;
-n_i_O2_d = Y(: , I(sw_o,1) + 2 : I(sw_o,1) + I(sw_o,2) + 2).*n_cr;
+N_init = [sum(init(1 : l_N2)) sum(init(l_N2 + 1 : l_N2 + l_O2)) ...
+          init(l_mol : l_c)'].*n_cr;
+n_i_N2_d = Y(: , 1 : l_N2).*n_cr;
+n_i_O2_d = Y(: , l_N2 + 1 : l_N2 + l_O2).*n_cr;
 n_N2_d = sum(n_i_N2_d , 2);
 n_O2_d = sum(n_i_O2_d , 2);
-n_NO_d = Y(: , I(sw_o,1) + I(sw_o,2) + 3).*n_cr;
-n_N_d = Y(: , I(sw_o,1) + I(sw_o,2) + 4).*n_cr;
-n_O_d = Y(: , I(sw_o,1) + I(sw_o,2) + 5).*n_cr;
+n_NO_d = Y(: , l_mol).*n_cr;
+n_N_d = Y(: , l_mol + 1).*n_cr;
+n_O_d = Y(: , l_c).*n_cr;
 N = [n_N2_d n_O2_d n_NO_d n_N_d n_O_d];
 rho = sum(ones(length(X),1)*m.*N , 2);
 

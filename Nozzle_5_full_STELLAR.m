@@ -55,9 +55,9 @@ n_cr = p_cr/k/T_cr;
     
      % vibrational energy of 0th levels
      
-     e_0_N2 = h*c*1e-2*1175.78;
-     e_0_O2 = h*c*1e-2*787.38;
-     e_0_NO = h*c*1e-2*948.646642922263;
+     e_0_N2 = h*c/k/T_cr*1e-2*1175.78;
+     e_0_O2 = h*c/k/T_cr*1e-2*787.38;
+     e_0_NO = h*c/k/T_cr*1e-2*948.646642922263;
      e_0 = [e_0_N2.*ones(1 , l_N2) e_0_O2.*ones(1 , l_O2) e_0_NO.*ones(1 , l_NO) 0 0];
      
      e_i = [e_i_N2 e_i_O2 e_i_NO 0 0];
@@ -71,15 +71,10 @@ n_cr = p_cr/k/T_cr;
      e_f = [zeros(1 , l_N2 + l_O2) e_NO.*ones(1 , l_NO) e_N e_O];
      
     %% Left part, matrix A (A(y)*y = b)
-    
-    % ��������������� ������� ��� ��������� �������
-    
-    T_energy1 = [2.5*T.*ones(1 , l_mol) 1.5*T 1.5*T];
-    T_energy2 = [3.5*T.*ones(1 , l_mol) 2.5*T 2.5*T];
-    
+   
     % kinetic equations
     
-    A(1 : l_c , 1 : l_c) = diag(v.*ones(1,l_c)); 
+    A(1 : l_c , 1 : l_c) = diag(v.*ones(1 , l_c)); 
     A(1 : l_c , l_v) = n; 
     
     % momentum equation
@@ -89,6 +84,9 @@ n_cr = p_cr/k/T_cr;
     A(l_v, l_T) = sum(n);
     
     % energy equation
+    
+    T_energy1 = [2.5*T.*ones(1 , l_mol) 1.5*T 1.5*T];
+    T_energy2 = [3.5*T.*ones(1 , l_mol) 2.5*T 2.5*T];
     
     A(l_T, 1 : l_c) = T_energy1 + e_i + e_0 + e_f; 
     A(l_T, l_v) = 1/v*sum(n.*(T_energy2  + e_i + e_0 + e_f));
@@ -113,9 +111,9 @@ n_cr = p_cr/k/T_cr;
     
     sw_o = 2;
     
-    [k_N2_VT, k_N2_N2_VV, k_N2_O2_VV, k_N2_NO_VV] = k_ssh(1,T_d);
-    [k_O2_VT, k_O2_N2_VV, k_O2_O2_VV, k_O2_NO_VV] = k_ssh(2,T_d);
-    [k_NO_VT, k_NO_N2_VV, k_NO_O2_VV, k_NO_NO_VV] = k_ssh(3,T_d);
+    [k_N2_VT, k_N2_N2_VV, k_N2_O2_VV, k_N2_NO_VV] = k_ssh(1 , T_d);
+    [k_O2_VT, k_O2_N2_VV, k_O2_O2_VV, k_O2_NO_VV] = k_ssh(2 , T_d);
+    [k_NO_VT, k_NO_N2_VV, k_NO_O2_VV, k_NO_NO_VV] = k_ssh(3 , T_d);
     
     % interpoltion anharmonical on STELLAR dictribution
     

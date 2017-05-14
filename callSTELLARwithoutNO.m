@@ -49,7 +49,8 @@ v_cr = v_cr + v_cr*0.1;
 
 %v_cr = 2000;
 
-options = odeset('AbsTol', eps, 'RelTol', 2.3e-14, 'OutputFcn', @odeplot, 'OutputSel', l_T);
+%options = odeset('AbsTol', 1e-52, 'RelTol', 2.3e-14, 'OutputFcn', @odeplot, 'OutputSel', l_T);
+options=odeset('AbsTol', 1e-54, 'RelTol', 2.3e-14,'Stats', 'on', 'OutputFcn', @odeplot, 'BDF', 'off', 'OutputSel', l_T);
 
 [X,Y] = Nozzle_5_full_STELLAR_withoutNO(x,init,options,T_cr,p_cr,v_cr);
 

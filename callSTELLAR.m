@@ -19,13 +19,8 @@ n_N2_cr = 0.79;
 n_O2_cr = 0.21;
 n_NO_cr = 0;
 
-if isunix
-    load('/home/ksusha/Desktop/Cloud Mail.Ru/S-t-s/Matlab/MAT/N2-O-NO-N-QCT-3D-Rates.mat');
-    load('/home/ksusha/Desktop/Cloud Mail.Ru/S-t-s/Matlab/MAT/O2-N-NO-O-QCT-3D-Rates.mat');
-else
-    load('C:\Users\Ksusha\Desktop\S-t-s\Matlab\MAT\N2-O-NO-N-QCT-3D-Rates.mat');
-    load('C:\Users\Ksusha\Desktop\S-t-s\Matlab\MAT\O2-N-NO-O-QCT-3D-Rates.mat');
-end
+load('./MAT/N2-O-NO-N-QCT-3D-Rates.mat');
+load('./MAT/O2-N-NO-O-QCT-3D-Rates.mat');
 
 k_ex_N2_STELLAR = 1.e-6.*N2_O_NO_N_Rates;
 k_ex_O2_STELLAR = 1.e-6.*O2_N_NO_O_Rates;

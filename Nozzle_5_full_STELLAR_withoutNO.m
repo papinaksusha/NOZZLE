@@ -54,9 +54,9 @@ n_cr = p_cr/k/T_cr;
     
      % vibrational energy of 0th levels
      
-     e_0_N2 = h*c*1e-2*1175.78;
-     e_0_O2 = h*c*1e-2*787.38;
-     e_0_NO = h*c*1e-2*948.646642922263;
+     e_0_N2 = h*c/k/T_cr*1e-2*1175.78;
+     e_0_O2 = h*c/k/T_cr*1e-2*787.38;
+     e_0_NO = h*c/k/T_cr*1e-2*948.646642922263;
      e_0 = [e_0_N2.*ones(1 , l_N2) e_0_O2.*ones(1 , l_O2) e_0_NO 0 0];
      
      e_i = [e_i_N2 e_i_O2 0 0 0];
@@ -71,11 +71,6 @@ n_cr = p_cr/k/T_cr;
      
     %% Left part, matrix A (A(y)*y = b)
     
-    % ��������������� ������� ��� ��������� �������
-    
-    T_energy1 = [2.5*T.*ones(1 , l_mol) 1.5*T 1.5*T];
-    T_energy2 = [3.5*T.*ones(1 , l_mol) 2.5*T 2.5*T];
-    
     % kinetic equations
     
     A(1 : l_c , 1 : l_c) = diag(v.*ones(1 , l_c)); 
@@ -89,9 +84,12 @@ n_cr = p_cr/k/T_cr;
     
     % energy equation
     
+    T_energy1 = [2.5*T.*ones(1 , l_mol) 1.5*T 1.5*T];
+    T_energy2 = [3.5*T.*ones(1 , l_mol) 2.5*T 2.5*T];
+    
     A(l_T, 1 : l_c) = T_energy1 + e_i + e_0 + e_f; 
     A(l_T, l_v) = 1/v*sum(n.*(T_energy2  + e_i + e_0 + e_f));
-    A(l_T, l_T) = 2.5*(sum(n_N2) + sum(n_O2) + n_NO) + 1.5*(n_N +n_O);
+    A(l_T, l_T) = 2.5*(sum(n_N2) + sum(n_O2) + n_NO) + 1.5*(n_N + n_O);
    
     AA = sparse(A);
     
@@ -101,8 +99,9 @@ n_cr = p_cr/k/T_cr;
         
     % dimensional variables
     
-    n_N2_d = [0 n_N2'.*n_cr 0]'*ones(1,5); %50*5
-    n_O2_d = [0 n_O2'.*n_cr 0]'*ones(1,5);
+    n_N2_d = [0 n_N2'.*n_cr 0]'*ones(1 , 5); %50*5
+    n_O2_d = [0 n_O2'.*n_cr 0]'*ones(1 , 5);
+    n_NO_d = n_NO*n_cr;
     n_N_d = n_N*n_cr;
     n_O_d = n_O*n_cr;
     T_d = T*T_cr;
@@ -111,8 +110,8 @@ n_cr = p_cr/k/T_cr;
     
     sw_o = 2;
     
-    [k_N2_VT, k_N2_N2_VV, k_N2_O2_VV, ~] = k_ssh(1,T_d);
-    [k_O2_VT, k_O2_N2_VV, k_O2_O2_VV, ~] = k_ssh(2,T_d);
+    [k_N2_VT, k_N2_N2_VV, k_N2_O2_VV, ~] = k_ssh(1 , T_d);
+    [k_O2_VT, k_O2_N2_VV, k_O2_O2_VV, ~] = k_ssh(2 , T_d);
     
     % interpoltion anharmonical on STELLAR dictribution
     
@@ -141,20 +140,19 @@ n_cr = p_cr/k/T_cr;
     k_N2_VT_r = k_N2_VT.*exp(-(e_i_N2(2 : end) - e_i_N2(1 : end - 1))'*ones(1,5)/T); %��������� ������
     k_O2_VT_r = k_O2_VT.*exp(-(e_i_O2(2 : end) - e_i_O2(1 : end - 1))'*ones(1,5)/T);
 
-       
     k_N2_VT = [zeros(1,5); k_N2_VT; zeros(1,5)]; %49*5
     k_O2_VT = [zeros(1,5); k_O2_VT; zeros(1,5)];
     k_N2_VT_r = [zeros(1,5); k_N2_VT_r; zeros(1,5)]; %49*5
     k_O2_VT_r = [zeros(1,5); k_O2_VT_r; zeros(1,5)];
     
-    n_c_N2 = ones(l_N2 , 1)*[sum(n_N2) sum(n_O2) sum(n_NO) n_N n_O].*n_cr; %  %*  48*5
+    n_c_N2 = ones(l_N2 , 1)*[sum(n_N2) sum(n_O2) n_NO n_N n_O].*n_cr; %  %*  48*5
     
     R_N2_VT = sum(n_c_N2.*(n_N2_d(1 : end - 2,:).*k_N2_VT_r(1 : end - 1,:) - ...
                            n_N2_d(2 : end - 1,:).*k_N2_VT(1 : end - 1,:) + ...
                            n_N2_d(3 : end,:).*k_N2_VT(2 : end,:) - ...
                            n_N2_d(2 : end - 1,:).*k_N2_VT_r(2 : end,:)) , 2); %48*1
                      
-    n_c_O2 = ones(l_O2 , 1)*[sum(n_N2) sum(n_O2) sum(n_NO) n_N n_O].*n_cr; 
+    n_c_O2 = ones(l_O2 , 1)*[sum(n_N2) sum(n_O2) n_NO n_N n_O].*n_cr; 
     
     R_O2_VT = sum(n_c_O2.*(n_O2_d(1 : end - 2,:).*k_O2_VT_r(1 : end - 1,:) - ...
                            n_O2_d(2 : end - 1,:).*k_O2_VT(1 : end - 1,:) + ...
@@ -215,8 +213,7 @@ n_cr = p_cr/k/T_cr;
     
     n_N2_d = n_N2.*n_cr;
     n_O2_d = n_O2.*n_cr;
-    n_NO_d = n_NO.*n_cr;
-    
+  
     TT = 100 : 100 : 100000;
     
     k_ex_N2 = interp2(TT , [0 : l_N2 - 1]',  squeeze(k_ex_N2_STELLAR(: , 1, :)) , T_d, [0 : l_N2 - 1]', 'spline');
@@ -243,17 +240,17 @@ n_cr = p_cr/k/T_cr;
     
     R_N2_ex = n_NO_d*n_N_d.*k_ex_N2_r - n_N2_d.*n_O_d.*k_ex_N2; %48*1
     R_O2_ex = n_NO_d*n_O_d.*k_ex_O2_r - n_O2_d.*n_N_d.*k_ex_O2;
-    R_NO_ex = -sum(R_N2_ex) - sum(R_O2_ex);
-    R_N_ex = -sum(R_N2_ex) + sum(R_O2_ex);
+    R_NO_ex = - sum(R_N2_ex) - sum(R_O2_ex);
+    R_N_ex = - sum(R_N2_ex) + sum(R_O2_ex);
     R_O_ex = sum(R_N2_ex) - sum(R_O2_ex);
     
     % Dissociation
     
-    n_N2_d = n_N2.*n_cr*ones(1,5); 
-    n_O2_d = n_O2.*n_cr*ones(1,5);
+    n_N2_d = n_N2.*n_cr*ones(1 , 5); 
+    n_O2_d = n_O2.*n_cr*ones(1 , 5);
     
-    k_diss_N2 = k_diss(1,T_d);
-    k_diss_O2 = k_diss(2,T_d);
+    k_diss_N2 = k_diss(1 , T_d);
+    k_diss_O2 = k_diss(2 , T_d);
     k_diss_NO(1:3) = 0.41e12/Na*T_d^(-1)*exp(-D(3)/k/T_d);
     k_diss_NO(4:5) = 0.3e12/Na*T_d^(0.5)*exp(-D(3)/k/T_d);
     
