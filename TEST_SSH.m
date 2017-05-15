@@ -1,5 +1,14 @@
 %% TEST SSH 
-% для сравнение с Олиной диссертацией
+% compare with Olya's dissertation
+
+global sw_o
+
+SW_O = sw_o;
+
+sw_o = 2;
+
+N_T = 100;
+TT = 2000 : N_T : 14000;
 
 K_ssh_VT_N2  = zeros(I(sw_o,1),5,length(TT));
 K_ssh_VV_N2_N2 = zeros(I(sw_o,1),I(sw_o,1),length(TT));
@@ -210,6 +219,8 @@ figure(fig)
 semilogy(TT, squeeze(K_ssh_VT_N2(9,1,:))), hold on
 semilogy(TT, squeeze(K_ssh_VT_N2(9,4,:)))
 semilogy(TT, squeeze(K_ssh_VV_N2_N2(9,3,:)))
-legend('VT с молекулой','VT c атомом','VV');
+legend('VT whith molecul','VT with atom','VV');
 hold off
 fig = fig + 1;
+
+sw_o = SW_O;

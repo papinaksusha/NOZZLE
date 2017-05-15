@@ -1,5 +1,10 @@
 %% TEST SSH 
-% для сравнение с Александровой
+% compare with Alexandrova's dissertation
+
+global sw_o
+
+SW_O = sw_o;
+sw_o = 2;
 
 N_T = 100;
 TT = 0 : N_T : 9000;
@@ -140,3 +145,5 @@ xlim([0, I(sw_o,2)]);
 ylabel('k_{N_2,i->i-1}^{N_2,16->17}');
 hold off
 fig = fig + 1;
+
+sw_o = SW_O;

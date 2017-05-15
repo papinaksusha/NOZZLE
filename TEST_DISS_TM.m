@@ -1,3 +1,15 @@
+%% TEST DISSOSIATION RATE COEFFICIENTS, TRINOR-MARRONE MODEL
+% compare with Olya's dissertation 
+
+global sw_o
+
+SW_O = sw_o;
+
+sw_o = 2;
+
+N_T = 100;
+TT = 2000 : N_T : 14000;
+
 k_diss_N2 = zeros(I(sw_o,1) + 1,5,length(TT));
 k_diss_O2 = zeros(I(sw_o,2) + 1,5,length(TT));
 
@@ -160,3 +172,5 @@ ylabel('lg(k_{rec, O_2i})')
 legend('T = 5000 K','T = 8000 K','T = 14000 K');
 hold off
 fig = fig + 1;
+
+sw_o = SW_O;

@@ -6,7 +6,7 @@ close all
 format long e
 addpath('./MAT/')
 
-global Na k h c w wx m theta_r D I sw_o sw_n ex_model e_STELLAR
+global Na k h c w wx m theta_r D I sw_o sw_n ex_model e_STELLAR molar
 
 %% CONSTs
 % J = kg*m^2/s^2, Pa = kg/m/s^2
@@ -71,12 +71,12 @@ fig = 1;
 % TT = 1000 : N_T : 9000;
 
 % TEST_SSH;
-% TEST_SSH_ALEX5
+% TEST_SSH_ALEX
 % TEST_DISS_TM;
 % TEST_EXCHANGE
 
 
 % callSTELLAR;
- callSTELLARwithoutNO;
+% callSTELLARwithoutNO;
 % call5;
 % call2;

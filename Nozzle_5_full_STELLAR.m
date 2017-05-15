@@ -1,14 +1,13 @@
-function [f1,f2] = Nozzle_5_full_STELLAR(x,init,options,T_cr,p_cr,v_cr)
+function [f1 , f2] = Nozzle_5_full_STELLAR(x , init , options , T_cr , p_cr , v_cr)
 
 global k h c m theta_r D sw_n L sw_o k_ex_N2_STELLAR k_ex_O2_STELLAR
 
 n_cr = p_cr/k/T_cr;
 
-[f1,f2] = ode15s(@nozzle_5_NO,x,init,options);
+[f1,f2] = ode15s(@nozzle_5_NO , x , init , options);
 
-    function dy = nozzle_5_NO(x,y)
-    % � ������������ NO 
-    
+    function dy = nozzle_5_NO(x , y)
+
     l_N2 = L(1);
     l_O2 = L(2);
     l_NO = L(3);
@@ -100,9 +99,9 @@ n_cr = p_cr/k/T_cr;
         
     % dimensional variables
     
-    n_N2_d = [0 n_N2'.*n_cr 0]'*ones(1,5); %50*5
-    n_O2_d = [0 n_O2'.*n_cr 0]'*ones(1,5);
-    n_NO_d = [0 n_NO'.*n_cr 0]'*ones(1,5);
+    n_N2_d = [0 n_N2'.*n_cr 0]'*ones(1 , 5); %50*5
+    n_O2_d = [0 n_O2'.*n_cr 0]'*ones(1 , 5);
+    n_NO_d = [0 n_NO'.*n_cr 0]'*ones(1 , 5);
     n_N_d = n_N*n_cr;
     n_O_d = n_O*n_cr;
     T_d = T*T_cr;
@@ -152,38 +151,38 @@ n_cr = p_cr/k/T_cr;
     
     % VT
 
-    k_N2_VT_r = k_N2_VT.*exp(-(e_i_N2(2 : end) - e_i_N2(1 : end - 1))'*ones(1,5)/T); %��������� ������
-    k_O2_VT_r = k_O2_VT.*exp(-(e_i_O2(2 : end) - e_i_O2(1 : end - 1))'*ones(1,5)/T);
-    k_NO_VT_r = k_NO_VT.*exp(-(e_i_NO(2 : end) - e_i_NO(1 : end - 1))'*ones(1,5)/T);
+    k_N2_VT_r = k_N2_VT.*exp(-(e_i_N2(2 : end) - e_i_N2(1 : end - 1))'*ones(1 , 5)/T); %��������� ������
+    k_O2_VT_r = k_O2_VT.*exp(-(e_i_O2(2 : end) - e_i_O2(1 : end - 1))'*ones(1 , 5)/T);
+    k_NO_VT_r = k_NO_VT.*exp(-(e_i_NO(2 : end) - e_i_NO(1 : end - 1))'*ones(1 , 5)/T);
     
        
-    k_N2_VT = [zeros(1,5); k_N2_VT; zeros(1,5)]; %49*5
-    k_O2_VT = [zeros(1,5); k_O2_VT; zeros(1,5)];
-    k_NO_VT = [zeros(1,5); k_NO_VT; zeros(1,5)];
-    k_N2_VT_r = [zeros(1,5); k_N2_VT_r; zeros(1,5)]; %49*5
-    k_O2_VT_r = [zeros(1,5); k_O2_VT_r; zeros(1,5)];
-    k_NO_VT_r = [zeros(1,5); k_NO_VT_r; zeros(1,5)];
+    k_N2_VT = [zeros(1 , 5); k_N2_VT; zeros(1 , 5)]; %49*5
+    k_O2_VT = [zeros(1 , 5); k_O2_VT; zeros(1 , 5)];
+    k_NO_VT = [zeros(1 , 5); k_NO_VT; zeros(1 , 5)];
+    k_N2_VT_r = [zeros(1 , 5); k_N2_VT_r; zeros(1 , 5)]; %49*5
+    k_O2_VT_r = [zeros(1 , 5); k_O2_VT_r; zeros(1 , 5)];
+    k_NO_VT_r = [zeros(1 , 5); k_NO_VT_r; zeros(1 , 5)];
     
     n_c_N2 = ones(l_N2 , 1)*[sum(n_N2) sum(n_O2) sum(n_NO) n_N n_O].*n_cr; %  %*  48*5
     
-    R_N2_VT = sum(n_c_N2.*(n_N2_d(1 : end - 2,:).*k_N2_VT_r(1 : end - 1,:) - ...
-                           n_N2_d(2 : end - 1,:).*k_N2_VT(1 : end - 1,:) + ...
-                           n_N2_d(3 : end,:).*k_N2_VT(2 : end,:) - ...
-                           n_N2_d(2 : end - 1,:).*k_N2_VT_r(2 : end,:)) , 2); %48*1
+    R_N2_VT = sum(n_c_N2.*(n_N2_d(1 : end - 2 , :).*k_N2_VT_r(1 : end - 1 , :) - ...
+                           n_N2_d(2 : end - 1 , :).*k_N2_VT(1 : end - 1 , :) + ...
+                           n_N2_d(3 : end , :).*k_N2_VT(2 : end , :) - ...
+                           n_N2_d(2 : end - 1 , :).*k_N2_VT_r(2 : end , :)) , 2); %48*1
                      
     n_c_O2 = ones(l_O2 , 1)*[sum(n_N2) sum(n_O2) sum(n_NO) n_N n_O].*n_cr; 
     
-    R_O2_VT = sum(n_c_O2.*(n_O2_d(1 : end - 2,:).*k_O2_VT_r(1 : end - 1,:) - ...
-                           n_O2_d(2 : end - 1,:).*k_O2_VT(1 : end - 1,:) + ...
-                           n_O2_d(3 : end,:).*k_O2_VT(2 : end,:) - ...
-                           n_O2_d(2 : end - 1,:).*k_O2_VT_r(2 : end,:)) , 2);
+    R_O2_VT = sum(n_c_O2.*(n_O2_d(1 : end - 2 , :).*k_O2_VT_r(1 : end - 1 , :) - ...
+                           n_O2_d(2 : end - 1 , :).*k_O2_VT(1 : end - 1 , :) + ...
+                           n_O2_d(3 : end , :).*k_O2_VT(2 : end , :) - ...
+                           n_O2_d(2 : end - 1 , :).*k_O2_VT_r(2 : end , :)) , 2);
     
     n_c_NO = ones(l_NO , 1)*[sum(n_N2) sum(n_O2) sum(n_NO) n_N n_O].*n_cr; 
                        
-    R_NO_VT = sum(n_c_NO.*(n_NO_d(1 : end - 2,:).*k_NO_VT_r(1 : end - 1,:) - ...
-                           n_NO_d(2 : end - 1,:).*k_NO_VT(1 : end - 1,:) + ...
-                           n_NO_d(3 : end,:).*k_NO_VT(2 : end,:) - ...
-                           n_NO_d(2 : end - 1,:).*k_NO_VT_r(2 : end,:)) , 2);                 
+    R_NO_VT = sum(n_c_NO.*(n_NO_d(1 : end - 2 , :).*k_NO_VT_r(1 : end - 1 , :) - ...
+                           n_NO_d(2 : end - 1 , :).*k_NO_VT(1 : end - 1 , :) + ...
+                           n_NO_d(3 : end , :).*k_NO_VT(2 : end , :) - ...
+                           n_NO_d(2 : end - 1 , :).*k_NO_VT_r(2 : end , :)) , 2);                 
     % VV 
     
     n_N2_d = [0 n_N2'.*n_cr 0]; %1*50

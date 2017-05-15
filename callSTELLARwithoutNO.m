@@ -35,7 +35,7 @@ e_i_O2 = cell2mat(e(2))';
 e_i_NO = cell2mat(e(3))';
 Z_vibr_N2 = sum(exp(-e_i_N2/k/T_cr));
 Z_vibr_O2 = sum(exp(-e_i_O2/k/T_cr));
-Z_vibr_NO = sum(exp(-e_i_NO/k/T_cr));
+%Z_vibr_NO = sum(exp(-e_i_NO/k/T_cr));
 
 init = zeros(l_T , 1);
 
@@ -45,14 +45,14 @@ init(l_v) = 1;
 init(l_T) = 1;
 v_cr = v_critical([sum(init(1 : l_N2)) sum(init(l_N2 + 1 : l_N2 + l_O2)) init(l_mol)...
                    init(l_mol + 1) init(l_c)] , T_cr);
-v_cr = v_cr + v_cr*0.1;
+v_cr = v_cr + v_cr*0.2;
 
 %v_cr = 2000;
 
 %options = odeset('AbsTol', 1e-52, 'RelTol', 2.3e-14, 'OutputFcn', @odeplot, 'OutputSel', l_T);
 options=odeset('AbsTol', 1e-54, 'RelTol', 2.3e-14,'Stats', 'on', 'OutputFcn', @odeplot, 'BDF', 'off', 'OutputSel', l_T);
 
-[X,Y] = Nozzle_5_full_STELLAR_withoutNO(x,init,options,T_cr,p_cr,v_cr);
+[X,Y] = Nozzle_5_full_STELLAR_withoutNO(x , init , options , T_cr , p_cr , v_cr);
 
 toc
 %%
