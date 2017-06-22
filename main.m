@@ -6,7 +6,7 @@ close all
 format long e
 addpath('./MAT/')
 
-global Na k h c w wx m theta_r D I sw_o sw_n ex_model e_STELLAR molar
+global Na k h c w wx m theta_r D I sw_o sw_n ex_model e_STELLAR molar rec
 
 %% CONSTs
 % J = kg*m^2/s^2, Pa = kg/m/s^2
@@ -19,7 +19,7 @@ k = 1.380648e-23;                                                          % J/K
 h = 6.626070e-34;                                                          % J*s, Planck constant
 c = 299792458;                                                             % m/s, speed of light 
 w = [235857 158019 190420];                                                % m^-1, spectroscopic constant
-sw_o = 3;                                                                  % switch on oscillator, 1 -  harmonic oscillator; 2 -  anharmonic oscillator 3 - STELLAR
+sw_o = 2;                                                                  % switch on oscillator, 1 -  harmonic oscillator; 2 -  anharmonic oscillator 3 - STELLAR
 switch sw_o 
     case 1
         wx = [0 0 0];   
@@ -32,9 +32,9 @@ molar = 1e-3.*[28.0134 31.99880 30.00610 14.0067 15.9994];                 % kg/
 m = 1.6605402e-24.*molar;                                                  % kg, molecular mass
 theta_r = [2.86 2.07 2.42];                                                % K, characteristic rotational emperature
 D = h*c.*[7.871e6 4.126e6 5.24e6];                                         % J, dissociation energy
-sw_n = 1;                                                                  % switcn on nozzle
+sw_n = 3;                                                                  % switcn on nozzle
 ex_model = 3;                                                              % exchange rate coefficients model
-                                                       
+rec = 1; % rec = 0 -without recombination                                                       
 % Max vibrational levels                                                 
 % I(1,:) - harmonic oscillator, I(2,:) - anharmonic oscillator, I(3,:) - STELLAR distributions
 
@@ -67,9 +67,6 @@ e_0_NO_STELLAR = h*c*1e-2*948.646642922263;
 
 fig = 1;
 
-% N_T = 100;
-% TT = 1000 : N_T : 9000;
-
 % TEST_SSH;
 % TEST_SSH_ALEX
 % TEST_DISS_TM;
@@ -78,5 +75,5 @@ fig = 1;
 
 % callSTELLAR;
 % callSTELLARwithoutNO;
-% call5;
+ call5;
 % call2;

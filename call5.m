@@ -10,7 +10,7 @@ x_N = 0.01;
 x = 0 : x_N : 50;
 %x = [0,50];
 T_cr = 7000;
-p_cr = 100*101325;
+p_cr = 1*101325;
 n_cr = p_cr/k/T_cr; 
 n_N2_cr = 0.79;
 n_O2_cr = 0.21;
@@ -34,7 +34,7 @@ v_cr = v_cr + v_cr*0.2;
 %v_cr = 2000;
 
 %options = odeset('AbsTol', 1e-52, 'RelTol', 2.3e-14, 'OutputFcn', @odeplot, 'OutputSel', l_T);
-options=odeset('AbsTol', 1e-54, 'RelTol', 2.3e-14,'Stats', 'on', 'OutputFcn', @odeplot, 'BDF', 'off', 'OutputSel', l_T);
+options=odeset('AbsTol', 1e-54, 'RelTol', 2.3e-14,'Stats', 'on', 'OutputFcn', @odeplot, 'BDF', 'on', 'OutputSel', l_T);
 
 [X,Y] = Nozzle_5_full(x , init , options , T_cr , p_cr , v_cr);
 
@@ -109,7 +109,7 @@ legend('N_2','O_2','NO','N','O');
 ylabel('n_c/n');
 xlabel('x/_r*');
 xlim([0,5]);
-ylim([1e-5,1]);
+%ylim([1e-5,1]);
 
 %% conservation laws
 

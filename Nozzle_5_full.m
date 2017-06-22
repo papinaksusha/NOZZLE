@@ -1,6 +1,6 @@
 function [f1,f2] = Nozzle_5_full(x,init,options,T_cr,p_cr,v_cr)
 
-global k h c w wx m theta_r D I sw_o sw_n ex_model Na
+global k h c w wx m theta_r D I sw_o sw_n ex_model Na rec
 
 n_cr = p_cr/k/T_cr;
 
@@ -27,6 +27,21 @@ n_cr = p_cr/k/T_cr;
              alpha = 0.117*pi;
              S(1) = (1+x*tan(alpha))^2;
              S(2) = 2*tan(alpha)*(1+x*tan(alpha));
+        case 2
+            r_cr = 3e-3;
+            alpha = 1/18*pi;
+            S(1) = 1+x^2*(tan(alpha))^2;
+            S(2) = 2*x*(tan(alpha))^2;
+        case 3
+            a = 0.3599;
+            bb = 0.2277;
+            cc = 0.1884;
+            d = 0.0184;
+            e = 0.1447;
+            r = a - bb - d/e;
+            S(1) = 1/r^2*(a-bb*exp(-cc*x^2*r^2)-d/(x^2*r^2+e))^2; 
+            S(2) = 2/r^2*(a-bb*exp(-cc*x^2*r^2)-d/(x^2*r^2+e))*(bb*cc*2*r^2*x*exp(-cc*x^2*r^2)+2*d*x*r^2/(x^2*r^2+e)^2);
+            r_cr = 1/r^2*(a-bb-d/e)^2; 
     end
     
     % dimensionless variables
@@ -227,12 +242,12 @@ n_cr = p_cr/k/T_cr;
     k_diss_NO(1:3) = 0.41e12/Na*T_d^(-1)*exp(- D(3)/k/T_d);
     k_diss_NO(4:5) = 0.3e12/Na*T_d^(0.5)*exp(- D(3)/k/T_d);
     
-    k_rec_N2 = k_diss_N2.*(m(1)/m(4)^2)^(1.5).*h^3.*(2*pi*k*T_d)^(- 1.5).*...
+    k_rec_N2 = rec.*k_diss_N2.*(m(1)/m(4)^2)^(1.5).*h^3.*(2*pi*k*T_d)^(- 1.5).*...
                 T_d./theta_r(1).*0.5.*exp(- e_i_N2'*ones(1 , 5)./T + D(1)/k/T_d); 
     k_rec_O2 = k_diss_O2.*(m(2)/m(5)^2)^(1.5).*h^3.*(2*pi*k*T_d)^(- 1.5).*...
-               T_d./theta_r(2).*0.5.*exp(- e_i_O2'*ones(1 , 5)./T + D(2)/k/T_d);
+               rec.*T_d./theta_r(2).*0.5.*exp(- e_i_O2'*ones(1 , 5)./T + D(2)/k/T_d);
     %Z_NO_int = sum(exp(-e_i_NO./T))*T_d/theta_r(3);
-    k_rec_NO = k_diss_NO.*(m(3)/m(4)/m(5))^(1.5)*h^3*(2*pi*k*T_d)^(-1.5)*T_d./theta_r(3)*exp(D(3)/k/T_d);
+    k_rec_NO = rec.*k_diss_NO.*(m(3)/m(4)/m(5))^(1.5)*h^3*(2*pi*k*T_d)^(-1.5)*T_d./theta_r(3)*exp(D(3)/k/T_d);
     
     R_N2_diss = sum(n_c_N2.*(n_N_d^2.*k_rec_N2 - n_N2_d.*k_diss_N2) , 2);
     R_O2_diss = sum(n_c_O2.*(n_O_d^2.*k_rec_O2 - n_O2_d.*k_diss_O2) , 2);

@@ -12,8 +12,8 @@ L = [l_N2 l_O2 l_NO l_mol l_c l_v l_T];
 
 x_N = 1e-2;
 x = 0 : x_N : 50;
-T_cr = 7000;
-p_cr = 100*101325;
+T_cr = 5000;
+p_cr = 1*101325;
 n_cr = p_cr/k/T_cr; 
 n_N2_cr = 0.79;
 n_O2_cr = 0.21;
@@ -44,12 +44,12 @@ v_cr = v_critical([sum(init(1 : l_N2)) sum(init(l_N2 + 1 : l_N2 + l_O2)) sum(l_N
                    init(l_mol + 1) init(l_c)] , T_cr);
 v_cr = v_cr + v_cr*0.2;
 
-%v_cr = 2000;
+v_cr = 2500;
 
-%options = odeset('AbsTol', eps, 'RelTol', 2.3e-14, 'OutputFcn', @odeplot, 'OutputSel', l_T);
-options = odeset('AbsTol', 1e-54, 'RelTol', 2.3e-14,'Stats', 'on', 'OutputFcn', @odeplot, 'BDF', 'off', 'OutputSel', l_T);
+options = odeset('AbsTol', 1e-54, 'RelTol', 2.3e-14, 'OutputFcn', @odeplot, 'OutputSel', l_T);
+%options = odeset('AbsTol', 1e-54, 'RelTol', 2.3e-14, 'OutputFcn', 'off', 'OutputSel', l_T);
 
-[X,Y] = Nozzle_5_full_STELLAR(x,init,options,T_cr,p_cr,v_cr);
+[X,Y] = Nozzle_5_full_STELLAR(x , init , options , T_cr , p_cr , v_cr);
 
 toc
 %%
